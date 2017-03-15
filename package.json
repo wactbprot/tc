@@ -1,5 +1,5 @@
 {
-  "name": "se3-vs",
+  "name": "tc",
   "version": "1.0.0",
   "description": "valve ctrl from touch screen",
   "main": "index.js",
@@ -7,5 +7,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "wactbprot@gmail.com",
-  "license": "ISC"
+  "license": "BSD"
 }
