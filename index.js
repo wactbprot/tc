@@ -10,18 +10,28 @@ var valve = {
   width: 30,
   height: 10,
   align : 'center',
-  content: '{green-fg}open{/green-fg}',
+  content: '{green-fg} testing ...{/green-fg}',
   tags: true,
   border: {
     type: 'line'
   },
   style: {
     fg: 'white',
-    bg: 'black',
-    hover: {
-      bg: '#f4c542',
-      fg: 'black'
-    }
+    bg: 'black'
+  }
+}
+
+var m = {
+  width: 90,
+  top:30,
+  left:0,
+  height: 2,
+  align : 'left',
+  content: 'q: quit',
+  tags: true,
+  style: {
+    fg: 'white',
+    bg: 'black'
   }
 }
 
@@ -88,9 +98,20 @@ screen.append(v7);
 screen.append(v8);
 screen.append(v9);
 
+
+screen.append(blessed.box(m));
+
+var s1 =true
 v1.on('click', function(data) {
-  v1.setContent('{red-fg}closed{/red-fg}');
-  screen.render();
+  if(s1){
+    v1.setContent('{red-fg}closed{/red-fg}');
+    screen.render();
+    s1 = !s1;
+  } else {
+    v1.setContent('{green-fg}open{/green-fg}');
+    screen.render();
+    s1 = !s1;
+  }
 });
 
 screen.render();
