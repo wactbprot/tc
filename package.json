@@ -1,0 +1,11 @@
+{
+  "name": "se3-vs",
+  "version": "1.0.0",
+  "description": "valve ctrl from touch screen",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wactbprot@gmail.com",
+  "license": "ISC"
+}
