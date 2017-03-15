@@ -5,10 +5,11 @@ var screen = blessed.screen({
   smartCSR: true
 });
 screen.title = 'se3 vs';
+var vw = 40, vh = 10;
 
 var valve = {
-  width: 30,
-  height: 10,
+  width: vw,
+  height: vh,
   align : 'center',
   content: '{green-fg} testing ...{/green-fg}',
   tags: true,
@@ -22,7 +23,7 @@ var valve = {
 }
 
 var m = {
-  width: 90,
+  width: 3*vw,
   top:30,
   left:0,
   height: 2,
@@ -47,32 +48,32 @@ var vb7 = JSON.parse(JSON.stringify(valve));
 var vb8 = JSON.parse(JSON.stringify(valve));
 var vb9 = JSON.parse(JSON.stringify(valve));
 
-vb1.top= 0;
-vb1.left= 0;
+vb1.top= 0 * vh;
+vb1.left= 0 * vw;
 
-vb2.top= 10;
-vb1.left= 0;
+vb2.top= 1 * vh;
+vb1.left= 0 * vw;
 
-vb3.top= 20;
-vb3.left= 0;
+vb3.top= 2*vh;
+vb3.left= 0 * vw;
 
-vb4.top= 0;
-vb4.left= 30;
+vb4.top= 0 * vh;
+vb4.left= 1 * vw;
 
-vb5.top= 10;
-vb5.left= 30;
+vb5.top= 1 * vh;
+vb5.left= 1 * vw;
 
-vb6.top= 20;
-vb6.left= 30;
+vb6.top= 2* vh;
+vb6.left= 1 * vw;
 
-vb7.top= 0;
-vb7.left= 60;
+vb7.top= 0* vh;
+vb7.left= 2 * vw;
 
-vb8.top= 10;
-vb8.left= 60;
+vb8.top= 1* vh;
+vb8.left= 2 * vw;
 
-vb9.top= 20;
-vb9.left= 60;
+vb9.top= 2* vh;
+vb9.left= 2 * vw;
 
 var v1 = blessed.box(vb1);
 var v2 = blessed.box(vb2);
