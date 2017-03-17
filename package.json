@@ -1,11 +1,17 @@
 {
-  "name": "tc",
-  "version": "1.0.0",
-  "description": "valve ctrl from touch screen",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "wactbprot@gmail.com",
-  "license": "BSD"
+    "name": "tc",
+    "version": "1.0.0",
+    "description": "valve ctrl from touch screen",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies":{
+	"blessed": ">=0.1.81",
+	"underscore": ">=1.8.3",
+	"commander": ">=2.9.0",
+	"sc-broker": ">=2.1.0"
+    },
+    "author": "wactbprot@gmail.com",
+    "license": "BSD"
 }
