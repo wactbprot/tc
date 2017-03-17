@@ -118,10 +118,10 @@ var update = function(v, e){
 
     if(_.isArray(e.Vold) && _.isArray(e.Eall)){
       var vstate  = e.Vold[vp] ? '{green-fg}open{/green-fg}' : '{red-fg}closed{/red-fg}'
-        , eclosed = e.Eall[eo] ? '{red-fg}no{/red-fg}'       : '{green-fg}yes{/green-fg}'
-        , eopen   = e.Eall[ec] ?  '{red-fg}no{/red-fg}'      : '{green-fg}yes{/green-fg}'
+        , eclosed = e.Eall[eo] ? '{red-fg}closed-switch: no{/red-fg}'       : '{green-fg}closed-switch: yes{/green-fg}'
+        , eopen   = e.Eall[ec] ?  '{red-fg}open-switch: no{/red-fg}'      : '{green-fg}open-switch: yes{/green-fg}'
 
-      v.box[i].setContent('' + n +' ' + vstate + '\nClosed-Switch: ' + eclosed + '\nOpen-Switch: ' + eopen );
+      v.box[i].setContent('' + n +'\n\n' + vstate + '\n' + eclosed + '\n' + eopen );
     }
   }
   return v;
