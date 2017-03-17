@@ -1,10 +1,10 @@
 var blessed = require('blessed')
-  , broker    = require("sc-broker")
-  , pj        = require("./package.json")
-  //, prog      = require("commander")
+  , broker  = require("sc-broker")
+  , _       = require("underscore")
+  , pj        = require("./package.json")  //, prog      = require("commander")
   , mem       = broker.createClient({port: 9000})
   , mpid      = "mpd-se3_valves"
-  , poll      = 2000;
+  , poll      = 1000;
 
 mem.publish("get_mp", mpid , function(err){
   if(!err){
@@ -96,13 +96,12 @@ mem.publish("get_mp", mpid , function(err){
       mem.get([mpid, "exchange"], function(err, exch){
         if(!err){
           var v =  update(valve, exch);
-          if(v){
-            valve = v;
-            screen.render();
+            if(v){
+              valve = v;
+              screen.render();
+            }
           }
-        }
       });
-      poll=1000;
     }, poll);
 
   }
@@ -110,18 +109,20 @@ mem.publish("get_mp", mpid , function(err){
 
 
 var update = function(v, e){
-  for( var i = 0; i < v.name.length; i++){
+
+  for(var i = 0; i < v.name.length; i++){
     var  n = v.name[i]
       , vp = v.vpos[i]
       , ec = v.eclosed[i]
       , eo = v.eopen[i]
 
-    var vstate  = e.Vold[vp] ? '{green-fg}open{/green-fg}' : '{red-fg}closed{/red-fg}' //0,1
-      , eclosed = e.Eall[eo] ? '{red-fg}no{/red-fg}'       : '{green-fg}yes{/green-fg}' //0,1
-      , eopen   = e.Eall[ec] ?  '{red-fg}no{/red-fg}'      : '{green-fg}yes{/green-fg}'//0,1
+    if(_.isArray(e.Vold) && _.isArray(e.Eall)){
+      var vstate  = e.Vold[vp] ? '{green-fg}open{/green-fg}' : '{red-fg}closed{/red-fg}'
+        , eclosed = e.Eall[eo] ? '{red-fg}no{/red-fg}'       : '{green-fg}yes{/green-fg}'
+        , eopen   = e.Eall[ec] ?  '{red-fg}no{/red-fg}'      : '{green-fg}yes{/green-fg}'
 
-    v.box[i].setContent('' + n +' ' + vstate + '\nClosed-Switch: ' + eclosed + '\nOpen-Switch: ' + eopen );
+      v.box[i].setContent('' + n +' ' + vstate + '\nClosed-Switch: ' + eclosed + '\nOpen-Switch: ' + eopen );
+    }
   }
   return v;
-
 }
