@@ -1,7 +1,7 @@
 var blessed = require('blessed')
   , broker    = require("sc-broker")
   , pj        = require("./package.json")
-  , prog      = require("commander")
+  //, prog      = require("commander")
   , mem       = broker.createClient({port: 9000})
   , mpid      = "mpd-se3_valves"
   , poll      = 2000;
