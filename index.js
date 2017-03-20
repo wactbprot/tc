@@ -109,17 +109,15 @@ mem.publish("get_mp", mpid , function(err){
 
 
 var update = function(v, e){
-
   for(var i = 0; i < v.name.length; i++){
-    var  n = v.name[i]
+    var n = v.name[i]
       , vp = v.vpos[i]
       , ec = v.eclosed[i]
       , eo = v.eopen[i]
-
     if(_.isArray(e.Vold) && _.isArray(e.Eall)){
-      var vstate  = e.Vold[vp] ? '{green-fg}open{/green-fg}' : '{red-fg}closed{/red-fg}'
-        , eclosed = e.Eall[eo] ? '{red-fg}closed-switch: no{/red-fg}'       : '{green-fg}closed-switch: yes{/green-fg}'
-        , eopen   = e.Eall[ec] ?  '{red-fg}open-switch: no{/red-fg}'      : '{green-fg}open-switch: yes{/green-fg}'
+      var vstate  = e.Vold[vp] ? '{green-fg}open{/green-fg}'          : '{red-fg}closed{/red-fg}'
+        , eclosed = e.Eall[eo] ? '{red-fg}closed-switch: no{/red-fg}' : '{green-fg}closed-switch: yes{/green-fg}'
+        , eopen   = e.Eall[ec] ? '{red-fg}open-switch: no{/red-fg}'   : '{green-fg}open-switch: yes{/green-fg}';
 
       v.box[i].setContent('' + n +'\n\n' + vstate + '\n' + eclosed + '\n' + eopen );
     }
