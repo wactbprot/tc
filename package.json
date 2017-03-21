@@ -9,6 +9,7 @@
     "dependencies":{
 	"blessed": ">=0.1.81",
 	"underscore": ">=1.8.3",
+	"request": ">=2.81.0",
 	"sc-broker": ">=2.1.0"
     },
     "author": "wactbprot@gmail.com",
