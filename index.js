@@ -2,7 +2,7 @@ var blessed = require('blessed')
   , _       = require("underscore")
   , request = require("request")
   , pj      = require("./package.json")
-  , poll    = 200;
+  , poll    = 100;
 var con = { method: 'POST',
             uri: 'http://localhost:55555/',
             json: true,
@@ -60,13 +60,13 @@ var state = (function(){
                    vs = s;
                  },
                  draw:function(v, i){
-
+                   var nd  = (new Date()).toTimeString().split(" ")[0]
                    if(es && vs && v.box && v.box[i]){
                      var vst = vs[v.vpos[i]] ? '{green-fg}open{/green-fg}'          : '{red-fg}closed{/red-fg}'
                        , ecl = es[v.eopen[i]] ? '{red-fg}closed-switch: no{/red-fg}' : '{green-fg}closed-switch: yes{/green-fg}'
                        , eop = es[v.eclosed[i]] ? '{red-fg}open-switch: no{/red-fg}'   : '{green-fg}open-switch: yes{/green-fg}';
 
-                     v.box[i].setContent('' + v.name[i] +'\n\n' + vst + '\n' + ecl + '\n' + eop );
+                     v.box[i].setContent('' + v.name[i] +'\n\n' + vst + '\n' + ecl + '\n' + eop + '\n' + nd);
                      screen.render();
                    }
                  }
@@ -124,29 +124,30 @@ var ini = function(i){
   valve.box.push(blessed.box(valve.ini[i]));
   screen.append(valve.box[i]);
 
-  valve.box[i].on('click',(function(j){
-                             return function(data) {
-
-                               wcon.body.Address = valve.wadr[j];
-                               var vc =  state.vGet();
-                               vc[valve.vpos[j]] = valve.vpos[j] == 1 ? 0 : 1;
-                               wcon.body.Value = vc;
-                               request(wcon, function(error, response, body){
-                                 if(error) {
-                                   console.log(error);
-                                 } else {
-                                   console.log(vc.join(":"));
-
-                                 }
-                               });
-
-                             }
-                           })(i));
+  valve.box[i].on('click', function(data){
+                  swtch(i);
+                 });
 
 
   screen.render();
 }
 
+var swtch =  function(j){
+  wcon.body.Address = valve.wadr[j];
+  var vc =  state.vGet();
+  if(_.isArray(vc)){
+    vc[valve.vpos[j]] = vc[valve.vpos[j]] == 1 ? 0 : 1;
+    wcon.body.Value = vc;
+    request(wcon, function(error, response, body){
+      if(error) {
+      console.log(error);
+      } else {
+        state.draw(valve, j);
+      }
+
+    });
+  }
+}
 
 
 
@@ -154,15 +155,13 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key) {
   return process.exit(0);
 });
 
+
 var first = true;
 setInterval(function(){
   var i =  count.next();
   if(first){
     ini(i);
     if(i == 11) first = false
-  }else{
-
-
   }
 
   rcon.body.Address = valve.vadr[i];
@@ -170,17 +169,19 @@ setInterval(function(){
     if(error) {
       console.log(error);
     } else {
+      if(body.Result){
       state.vSet(body.Result);
-      rcon.body.Address = valve.eadr[i];
-      request(rcon, function(error, response, body){
-        if(error) {
-          console.log(error);
-        } else {
-          state.eSet(body.Result);
-          state.draw(valve, i);
+        rcon.body.Address = valve.eadr[i];
+        request(rcon, function(error, response, body){
+          if(error) {
+            console.log(error);
+          } else {
+            state.eSet(body.Result);
+            state.draw(valve, i);
 
-        }
-      })
+          }
+        });
+      }
     }
   });
 }, poll);
