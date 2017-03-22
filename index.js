@@ -2,7 +2,11 @@ var blessed = require('blessed')
   , _       = require("underscore")
   , request = require("request")
   , pj      = require("./package.json")
-  , poll    = 100;
+  , poll    = 300
+  , W = 4
+  , H = 4
+  , N = W * H
+;
 var con = { method: 'POST',
             uri: 'http://i75422:55555/',
             json: true,
@@ -29,7 +33,7 @@ screen.title = pj.name +' version: ' + pj.version + ' (q: quit)';
 
 var count = (function(){
                var i = 0
-                 , n = 12;
+                 , n = N;
                return {
                  current:function(){
                    return i;
@@ -37,7 +41,7 @@ var count = (function(){
                  next: function(){
                    var j = i;
                    i++;
-                   if(i == 12) i=0;
+                   if(i == N) i=0;
                    return j;
                  }
                }
@@ -71,13 +75,13 @@ var state = (function(){
                  draw:function(v, i){
                    var nd  = (new Date()).toTimeString().split(" ")[0]
                    if(ec && eo && vs && v.box && v.box[i]){
-                     var ecl = ec[v.eadr[i]][v.eclosed[i]] ? 'closed-switch: off' : 'closed-switch: on'
-                       , eop = eo[v.eadr[i]][v.eopen[i]] ? 'open-switch: off'   : 'open-switch: on'
-                       , ostr = '{green-fg}' + v.name[i] +'\n\nopen\n'   + ecl + '\n' + eop + '\n{/green-fg}'
-                       , cstr = '{red-fg}'   + v.name[i] +'\n\nclosed\n' + ecl + '\n' + eop + '\n{/red-fg}'
+                     var ecl = ec[v.eadr[i]][v.eclosed[i]] ? 'closed-sw: off' : 'closed-sw: on'
+                       , eop = eo[v.eadr[i]][v.eopen[i]] ? 'open-sw: off'   : 'open-sw: on'
+                       , ostr = '{green-fg}{bold}' + v.name[i] +'{/bold}\nopen\n'   + ecl + '\n' + eop + '\n{/green-fg}'
+                       , cstr = '{red-fg}{bold}'   + v.name[i] +'{/bold}\nclosed\n' + ecl + '\n' + eop + '\n{/red-fg}'
 
                      var vstr = vs[v.vadr[i]][v.vpos[i]] ? ostr : cstr;
-                     v.box[i].setContent( vstr  + nd);
+                     v.box[i].setContent( vstr  + 'update: ' + nd);
                      screen.render();
                    }
                  }
@@ -87,12 +91,13 @@ var state = (function(){
 
 var valve = {
   proto : {
-    width: parseInt(screen.width/3),
-    height: parseInt((screen.height)/4),
+    width: parseInt(screen.width / W),
+    height: parseInt((screen.height)/ H),
     align : 'center',
     content: '{green-fg} start up ...{/green-fg}',
     tags: true,
     border: {
+      fg: 'blue',
       type: 'line'
     },
     style: {
@@ -100,26 +105,31 @@ var valve = {
       bg: 'black'
     }
   },
-  "vadr": ["45407","45407","45407","45407","45409","45409","45409","45409","45411","45411","45411","45411"],
-  "eadr": ["45395","45395","45395","45395","45397","45397","45397","45397","45399","45399","45399","45399"],
-  "wadr": ["40003","40003","40003","40003","40004","40004","40004","40004","40005","40005","40005","40005"],
-  name:[ "V1 (shutter)"
-       , "V2 (1T CDGs)"
-       , "V3 (10T CDGs)"
-       , "V4 (100T CDGs)"
-       , "V5 (vessel)"
-       , "V6"
-       , "V7"
-       , "V8"
-       , "V9"
-       , "V10"
-       , "V11"
-       , "V12"],
-  row     :[ 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3],
-  col     :[ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
-  vpos    :[ 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6],
-  eopen   :[ 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6],
-  eclosed :[ 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7],
+  "vadr": ["45407","45407","45407","45407"
+          ,"45409","45409","45409","45409"
+          ,"45411","45411","45411","45411"
+          ,"45413","45413","45413","45413"
+          ],
+  "eadr": ["45395","45395","45395","45395"
+          ,"45397","45397","45397","45397"
+          ,"45399","45399","45399","45399"
+          ,"45401","45401","45401","45401"
+          ],
+  "wadr": ["40003","40003","40003","40003"
+          ,"40004","40004","40004","40004"
+          ,"40005","40005","40005","40005"
+          ,"40006","40006","40006","40006"
+          ],
+  name:[ "V1 (shutter)" , "V2 (1T CDGs)" , "V3 (10T CDGs)" , "V4 (100T CDGs)"
+       , "V5 (vessel)"  , "V6"           , "V7"            , "V8"
+       , "V9"           , "V10"          , "V11"           , "V12"
+       , "V13"          , "V14"          , "V15"           , "V16"
+       ],
+  row     :[ 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3],
+  col     :[ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
+  vpos    :[ 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6],
+  eopen   :[ 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6],
+  eclosed :[ 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7],
   ini:[],
   box:[]
 }
@@ -136,8 +146,8 @@ var ini = function(i){
   screen.append(valve.box[i]);
 
   valve.box[i].on('click', function(data){
-                  swtch(i);
-                 });
+    swtch(i);
+  });
 
 
   screen.render();
@@ -154,7 +164,6 @@ var swtch =  function(j){
     wcon.body.Value = vc;
     request(wcon, function(error, response, body){
       if(error) {
-      console.log(error);
       } else {
         state.draw(valve, j);
       }
@@ -175,7 +184,7 @@ setInterval(function(){
   var i =  count.next();
   if(first){
     ini(i);
-    if(i == 11) first = false
+    if(i == N - 1) first = false
   }
 
   var vadr = valve.vadr[i]
@@ -185,7 +194,7 @@ setInterval(function(){
       console.log(error);
     } else {
       if(body.Result){
-      state.vSet(body.Result, vadr, i);
+        state.vSet(body.Result, vadr, i);
         var eadr = valve.eadr[i]
         rcon.body.Address = eadr;
 
