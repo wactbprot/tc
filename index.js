@@ -4,7 +4,7 @@ var blessed = require('blessed')
   , pj      = require("./package.json")
   , poll    = 100;
 var con = { method: 'POST',
-            uri: 'http://localhost:55555/',
+            uri: 'http://i75422:55555/',
             json: true,
             body: {
               "Skip": 1,
