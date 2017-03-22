@@ -62,11 +62,13 @@ var state = (function(){
                  draw:function(v, i){
                    var nd  = (new Date()).toTimeString().split(" ")[0]
                    if(es && vs && v.box && v.box[i]){
-                     var vst = vs[v.vpos[i]] ? '{green-fg}open{/green-fg}'          : '{red-fg}closed{/red-fg}'
-                       , ecl = es[v.eopen[i]] ? '{red-fg}closed-switch: no{/red-fg}' : '{green-fg}closed-switch: yes{/green-fg}'
-                       , eop = es[v.eclosed[i]] ? '{red-fg}open-switch: no{/red-fg}'   : '{green-fg}open-switch: yes{/green-fg}';
+                     var ecl = es[v.eopen[i]] ? 'closed-switch: off' : 'closed-switch: on'
+                       , eop = es[v.eclosed[i]] ? 'open-switch: off'   : 'open-switch: on'
+                       , ostr = '{green-fg}' + v.name[i] +'\n\nopen\n'   + ecl + '\n' + eop + '\n{/green-fg}'
+                       , cstr = '{red-fg}'   + v.name[i] +'\n\nclosed\n' + ecl + '\n' + eop + '\n{/red-fg}'
 
-                     v.box[i].setContent('' + v.name[i] +'\n\n' + vst + '\n' + ecl + '\n' + eop + '\n' + nd);
+                     var vstr = vs[v.vpos[i]] ? ostr : cstr;
+                     v.box[i].setContent( vstr  + nd);
                      screen.render();
                    }
                  }
