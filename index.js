@@ -2,11 +2,12 @@ var blessed = require('blessed')
   , _       = require("underscore")
   , request = require("request")
   , pj      = require("./package.json")
-  , poll    = 300
+  , poll    = 400
+  , delay   = 300
   , W = 4
   , H = 4
-  , N = W * H
-;
+  , N = W * H;
+
 var con = { method: 'POST',
             uri: 'http://i75422:55555/',
             json: true,
@@ -19,7 +20,7 @@ var con = { method: 'POST',
             }
           };
 var rcon = JSON.parse(JSON.stringify(con))
-  ,  wcon = JSON.parse(JSON.stringify(con));
+  , wcon = JSON.parse(JSON.stringify(con));
 
 rcon.body.FunctionCode = "ReadHoldingRegisters";
 wcon.body.FunctionCode = "writeSingleRegister";
@@ -60,51 +61,67 @@ var state = (function(){
                  },
                  ecSet:function(s, adr){
                    ec[adr] = s;
-
                  },
                  eoSet:function(s, adr){
                    eo[adr] = s;
-
                  },
                  vGet:function(adr){
                    return vs[adr];
                  },
                  vSet:function(s, adr){
                    vs[adr] = s;
-                 },
-                 draw:function(v, i){
-                   var nd  = (new Date()).toTimeString().split(" ")[0]
-                   if(ec && eo && vs && v.box && v.box[i]){
-                     var ecl = ec[v.eadr[i]][v.eclosed[i]] ? 'closed-sw: off' : 'closed-sw: on'
-                       , eop = eo[v.eadr[i]][v.eopen[i]] ? 'open-sw: off'   : 'open-sw: on'
-                       , ostr = '{green-fg}{bold}' + v.name[i] +'{/bold}\nopen\n'   + ecl + '\n' + eop + '\n{/green-fg}'
-                       , cstr = '{red-fg}{bold}'   + v.name[i] +'{/bold}\nclosed\n' + ecl + '\n' + eop + '\n{/red-fg}'
-
-                     var vstr = vs[v.vadr[i]][v.vpos[i]] ? ostr : cstr;
-                     v.box[i].setContent( vstr  + 'update: ' + nd);
-                     screen.render();
-                   }
                  }
                }
              })();
 
+var draw = function(i){
+  var eadr = valve.eadr[i]
+    , vadr = valve.vadr[i]
+    , ec   = state.ecGet(eadr)
+    , eo   = state.eoGet(eadr)
+    , vs   = state.vGet(vadr)
+    , nd   = (new Date()).toTimeString().split(" ")[0]
+
+  if(ec && eo && vs && box[i]){
+    var ecl = ec[valve.eclosed[i]] ? 'closed-sw: {green-fg}on{/green-fg}' :'closed-sw:{red-fg} off{/red-fg}'
+      , eop = eo[valve.eopen[i]] ?  'open-sw:{green-fg} on{/green-fg}' : 'open-sw:{red-fg} off{/red-fg}'
+      , ostr = '{green-fg}{bold}' + valve.name[i] +'{/bold}\nopen\n'   + ecl + '\n' + eop + '\n{/green-fg}'
+      , cstr = '{red-fg}{bold}'   + valve.name[i] +'{/bold}\nclosed\n' + ecl + '\n' + eop + '\n{/red-fg}'
+
+    var vstr = vs[valve.vpos[i]] ? ostr : cstr;
+    box[i].setContent( vstr  + 'update: ' + nd);
+    screen.render();
+  }
+}
+
+var proto = {
+  width: parseInt(screen.width / W),
+  height: parseInt((screen.height) / H),
+  align : 'center',
+  content: '{green-fg} start up ...{/green-fg}',
+  tags: true,
+  border: {
+    fg: 'white',
+    type: 'line'
+  },
+  style: {
+    fg: 'white',
+    bg: 'black'
+  },
+  row     :[ 0, 1, 2, 3
+           , 0, 1, 2, 3
+           , 0, 1, 2, 3
+           , 0, 1, 2, 3
+           ],
+  col     :[ 0, 0, 0, 0,
+             1, 1, 1, 1,
+             2, 2, 2, 2,
+             3, 3, 3, 3
+           ]
+}
 
 var valve = {
-  proto : {
-    width: parseInt(screen.width / W),
-    height: parseInt((screen.height)/ H),
-    align : 'center',
-    content: '{green-fg} start up ...{/green-fg}',
-    tags: true,
-    border: {
-      fg: 'blue',
-      type: 'line'
-    },
-    style: {
-      fg: 'white',
-      bg: 'black'
-    }
-  },
+
   "vadr": ["45407","45407","45407","45407"
           ,"45409","45409","45409","45409"
           ,"45411","45411","45411","45411"
@@ -125,91 +142,95 @@ var valve = {
        , "V9"           , "V10"          , "V11"           , "V12"
        , "V13"          , "V14"          , "V15"           , "V16"
        ],
-  row     :[ 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3],
-  col     :[ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
-  vpos    :[ 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6],
-  eopen   :[ 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6, 0, 2, 4, 6],
-  eclosed :[ 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7, 1, 3, 5, 7],
-  ini:[],
-  box:[]
+  vpos    :[ 0, 2, 4, 6
+           , 0, 2, 4, 6
+           , 0, 2, 4, 6
+           , 0, 2, 4, 6],
+  eopen   :[ 0, 2, 4, 6
+           , 0, 2, 4, 6
+           , 0, 2, 4, 6
+           , 0, 2, 4, 6],
+  eclosed :[ 1, 3, 5, 7
+           , 1, 3, 5, 7
+           , 1, 3, 5, 7
+           , 1, 3, 5, 7]
 }
+
+var box = []
 
 var ini = function(i){
 
-  valve.ini.push(JSON.parse(JSON.stringify(valve.proto)))
+  var v = JSON.parse(JSON.stringify(proto))
+  v.top      = proto.height * proto.row[i];
+  v.left     = proto.width  * proto.col[i];
+  v.content  = valve.name[i];
 
-  valve.ini[i].top      = valve.proto.height * valve.row[i];
-  valve.ini[i].left     = valve.proto.width * valve.col[i];
-  valve.ini[i].content  = valve.name[i];
+  box.push(blessed.box(v));
+  screen.append(box[i]);
 
-  valve.box.push(blessed.box(valve.ini[i]));
-  screen.append(valve.box[i]);
-
-  valve.box[i].on('click', function(data){
+  box[i].on('click', function(data){
     swtch(i);
   });
-
-
   screen.render();
 }
 
-var swtch =  function(j){
-  var wadr = valve.wadr[j];
-  var vadr = valve.vadr[j];
 
-  wcon.body.Address = wadr ;
-  var vc =  state.vGet(vadr);
+var swtch =  function(i){
+  var wadr = valve.wadr[i]
+    , vadr = valve.vadr[i]
+    , vc   = state.vGet(vadr);
+
   if(_.isArray(vc)){
-    vc[valve.vpos[j]] = vc[valve.vpos[j]] == 1 ? 0 : 1;
+    vc[valve.vpos[i]] = vc[valve.vpos[i]] == 1 ? 0 : 1;
+    wcon.body.Address = wadr ;
     wcon.body.Value = vc;
     request(wcon, function(error, response, body){
-      if(error) {
-      } else {
-        state.draw(valve, j);
+      if(!error) {
+        update(i);
       }
-
     });
   }
 }
-
 
 
 screen.key(['escape', 'q', 'C-c'], function(ch, key) {
   return process.exit(0);
 });
 
-
-var first = true;
-setInterval(function(){
-  var i =  count.next();
-  if(first){
-    ini(i);
-    if(i == N - 1) first = false
-  }
-
+var update = function(i){
   var vadr = valve.vadr[i]
+    , eadr = valve.eadr[i]
+
   rcon.body.Address = vadr;
   request(rcon, function(error, response, body){
-    if(error) {
-      console.log(error);
-    } else {
-      if(body.Result){
+    if(!error) {
+      if(body.Result && _.isArray(body.Result)){
+
         state.vSet(body.Result, vadr, i);
-        var eadr = valve.eadr[i]
         rcon.body.Address = eadr;
 
-        request(rcon, function(error, response, body){
-          if(error) {
-            console.log(error);
-          } else {
-            state.ecSet(body.Result, eadr, i);
-            state.eoSet(body.Result, eadr, i);
-            state.draw(valve, i);
+                        request(rcon, function(error, response, body){
+                          if(!error) {
+                            if(body.Result && _.isArray(body.Result)){
 
-          }
-        });
+                              state.ecSet(body.Result, eadr, i);
+                              state.eoSet(body.Result, eadr, i);
+                              draw(i);
+                            }
+                          }
+                        });
+
       }
     }
   });
+}
+
+setInterval(function(){
+  update(count.next())
 }, poll);
-//ini();
+
+(function(){
+  for(var i = 0; i < valve.name.length; i++){
+    ini(i);
+  }
+})()
